@@ -68,6 +68,7 @@ testLoadingComponent.validate();
 azdata.window.createModelViewDialog('MyTitle', 'MyDialog', 'narrow');
 azdata.window.createModelViewDialog('MyTitle2', 'MyDialog2', 'narrow', 'callout', 'below', true, true, { xPos: 0, yPos: 0, width: 100, height: 100 });
 azdata.window.createModelViewDashboard('MyDashboardTitle', 'MyDashboard', { showIcon: true, alwaysShowTabs: false });
+azdata.workspace.createModelViewEditor('MyEditorTitle', {}, 'MyEditorName');
 
 const testCard: azdata.CardProperties = {
     label: 'test-label',
@@ -124,3 +125,19 @@ const account: azdata.Account = {
 };
 
 azdata.accounts.getAccountSecurityToken(account, 'tenant-id', azdata.AzureResource.Custom);
+
+const connectionProfile: azdata.connection.ConnectionProfile = {
+    providerId: 'MyProvider',
+    connectionId: 'MyConnectionId',
+    connectionName: 'MyConnectionName',
+    serverName: 'MyServerName',
+    databaseName: 'MyDatabaseName',
+    userName: 'MyUsername',
+    password: 'MyPassword',
+    authenticationType: azdata.connection.AuthenticationType.SqlLogin,
+    savePassword: false,
+    groupFullName: 'MyGroupFullName',
+    groupId: 'MyGroupId',
+    saveProfile: false,
+    options: {}
+};

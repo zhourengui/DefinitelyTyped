@@ -98,7 +98,10 @@ declare namespace chrome.accessibilityFeatures {
  * Manifest:  "action": {...}
  */
 declare namespace chrome.action {
-    export interface BadgeBackgroundColorDetails {
+    /** @deprecated Use BadgeColorDetails instead. */
+    export interface BadgeBackgroundColorDetails extends BadgeColorDetails {}
+
+    export interface BadgeColorDetails {
         /** An array of four integers in the range [0,255] that make up the RGBA color of the badge. For example, opaque red is [255, 0, 0, 255]. Can also be a string with a CSS value, with opaque red being #FF0000 or #F00. */
         color: string | ColorArray;
         /** Optional. Limits the change to when a particular tab is selected. Automatically resets when the tab is closed.  */
@@ -218,6 +221,19 @@ declare namespace chrome.action {
     export function getBadgeText(details: TabDetails): Promise<string>;
 
     /**
+     * Since Chrome 110.
+     * Gets the text color of the action.
+     */
+    export function getBadgeTextColor(details: TabDetails, callback: (result: ColorArray) => void): void;
+
+    /**
+     * Since Chrome 110.
+     * Gets the text color of the action.
+     * @return The `getBadgeTextColor` method provides its result via callback or returned as a `Promise` (MV3 only).
+     */
+    export function getBadgeTextColor(details: TabDetails): Promise<ColorArray>;
+
+    /**
      * Since Chrome 88.
      * Gets the html document set as the popup for this action.
      */
@@ -257,6 +273,19 @@ declare namespace chrome.action {
     export function getUserSettings(): Promise<UserSettings>;
 
     /**
+     * Since Chrome 110.
+     * Indicates whether the extension action is enabled for a tab (or globally if no tabId is provided). Actions enabled using only declarativeContent always return false.
+     */
+    export function isEnabled(tabId: number | undefined, callback: (isEnabled: boolean) => void): void;
+
+    /**
+     * Since Chrome 110.
+     * Indicates whether the extension action is enabled for a tab (or globally if no tabId is provided). Actions enabled using only declarativeContent always return false.
+     * @return True if the extension action is enabled.
+     */
+    export function isEnabled(tabId?: number): Promise<boolean>;
+
+    /**
      * Since Chrome 99+.
      * Opens the extension's popup.
      * @param options Specifies options for opening the popup.
@@ -278,13 +307,13 @@ declare namespace chrome.action {
      * Sets the background color for the badge.
      * @return The `setBadgeBackgroundColor` method provides its result via callback or returned as a `Promise` (MV3 only). It has no parameters.
      */
-    export function setBadgeBackgroundColor(details: BadgeBackgroundColorDetails): Promise<void>;
+    export function setBadgeBackgroundColor(details: BadgeColorDetails): Promise<void>;
 
     /**
      * Since Chrome 88.
      * Sets the background color for the badge.
      */
-    export function setBadgeBackgroundColor(details: BadgeBackgroundColorDetails, callback: () => void): void;
+    export function setBadgeBackgroundColor(details: BadgeColorDetails, callback: () => void): void;
 
     /**
      * Since Chrome 88.
@@ -298,6 +327,19 @@ declare namespace chrome.action {
      * Sets the badge text for the action. The badge is displayed on top of the icon.
      */
     export function setBadgeText(details: BadgeTextDetails, callback: () => void): void;
+
+    /**
+     * Since Chrome 110.
+     * Sets the text color for the badge.
+     * @return The `setBadgeTextColor` method provides its result via callback or returned as a `Promise` (MV3 only). It has no parameters.
+     */
+    export function setBadgeTextColor(details: BadgeColorDetails): Promise<void>;
+
+    /**
+     * Since Chrome 100.
+     * Sets the text color for the badge.
+     */
+    export function setBadgeTextColor(details: BadgeColorDetails, callback: () => void): void;
 
     /**
      * Since Chrome 88.
@@ -1009,6 +1051,8 @@ declare namespace chrome.browsingData {
         downloads?: boolean | undefined;
         /** Optional. The browser's cache. Note: when removing data, this clears the entire cache: it is not limited to the range you specify.  */
         cache?: boolean | undefined;
+        /** Optional. The browser's cacheStorage.  */
+        cacheStorage?: boolean | undefined;
         /** Optional. Websites' appcaches.  */
         appcache?: boolean | undefined;
         /** Optional. Websites' file systems.  */
@@ -4869,7 +4913,7 @@ declare namespace chrome.input.ime {
          * The auto-capitalize type of the text field.
          * @since Chrome 69.
          */
-        autoCaptialize: AutoCapitalizeType;
+        autoCapitalize: AutoCapitalizeType;
         /**
          * Whether text entered into the text field should be used to improve typing suggestions for the user.
          * @since Chrome 68.
@@ -6862,6 +6906,16 @@ declare namespace chrome.runtime {
          * @since Chrome 80.
          */
         origin?: string | undefined;
+        /**
+         * The lifecycle the document that opened the connection is in at the time the port was created. Note that the lifecycle state of the document may have changed since port creation.
+         * @since Chrome 106.
+         */
+        documentLifecycle?: string | undefined;
+        /**
+         * A UUID of the document that opened the connection.
+         * @since Chrome 106.
+         */
+        documentId?: string | undefined;
     }
 
     /**
@@ -8376,7 +8430,7 @@ declare namespace chrome.system.display {
          * This is only valid for the primary display.
          * If provided, mirroringSourceId must not be provided and other properties may not apply.
          * This is has no effect if not provided.
-         * @see(See `enableUnifiedDesktop` for details).
+         * @see `enableUnifiedDesktop` for details
          * @since Chrome 59
          */
         isUnified?: boolean | undefined;
@@ -8429,7 +8483,7 @@ declare namespace chrome.system.display {
 
         /**
          * If set, updates the display's logical bounds origin along y-axis.
-         * @see[See documentation for boundsOriginX parameter.]
+         * @see boundsOriginX
          */
         boundsOriginY?: number | undefined;
 
@@ -8457,7 +8511,7 @@ declare namespace chrome.system.display {
     export interface DisplayInfoFlags {
         /**
          * If set to true, only a single DisplayUnitInfo will be returned by getInfo when in unified desktop mode.
-         * @see[enableUnifiedDesktop]
+         * @see enableUnifiedDesktop
          * @default false
          */
         singleUnified?: boolean | undefined;
@@ -9153,11 +9207,21 @@ declare namespace chrome.tabs {
          * @since Chrome 41.
          */
         frameId?: number | undefined;
+        /**
+         * Optional. Open a port to a specific document identified by documentId instead of all frames in the tab.
+         * @since Chrome 106.
+         */
+        documentId?: string;
     }
 
     export interface MessageSendOptions {
         /** Optional. Send a message to a specific frame identified by frameId instead of all frames in the tab. */
         frameId?: number | undefined;
+        /**
+         * Optional. Send a message to a specific document identified by documentId instead of all frames in the tab.
+         * @since Chrome 106.
+         */
+        documentId?: string;
     }
 
     export interface GroupOptions {

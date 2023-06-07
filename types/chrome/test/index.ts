@@ -1014,6 +1014,7 @@ function testBrowserAcionGetBadgeBackgroundColor() {
     chrome.browserAction.getBadgeBackgroundColor(undefined);
 }
 
+
 // https://developer.chrome.com/docs/extensions/reference/browserAction/#method-getBadgeText
 function testBrowserAcionGetBadgeText() {
     chrome.browserAction.getBadgeText({}, console.log);
@@ -1175,15 +1176,28 @@ async function testActionForPromise() {
     await chrome.action.enable(0);
     await chrome.action.getBadgeBackgroundColor({});
     await chrome.action.getBadgeText({});
+    const getBackTextColor1: chrome.action.ColorArray = await chrome.action.getBadgeTextColor({});
+    const getBackTextColor2: chrome.action.ColorArray = await chrome.action.getBadgeTextColor({ tabId: 0 });
     await chrome.action.getPopup({});
     await chrome.action.getTitle({});
     await chrome.action.getUserSettings();
+    const isEnabled1: boolean = await chrome.action.isEnabled();
+    const isEnabled2: boolean = await chrome.action.isEnabled(0);
     await chrome.action.openPopup({ windowId: 1 });
     await chrome.action.setBadgeBackgroundColor({ color: 'white' });
     await chrome.action.setBadgeText({ text: 'text1' });
+    await chrome.action.setBadgeTextColor({ color: 'white' });
     await chrome.action.setIcon({ path: { '16': 'path/to/icon.png' } });
     await chrome.action.setPopup({ popup: 'popup1' });
     await chrome.action.setTitle({ title: 'title1' });
+}
+
+// https://developer.chrome.com/docs/extensions/reference/action/
+async function testActionForCallback() {
+    chrome.action.getBadgeTextColor({}, (color: chrome.action.ColorArray) => void 0);
+    chrome.action.getBadgeTextColor({ tabId: 0 }, (color: chrome.action.ColorArray) => void 0);
+    chrome.action.isEnabled(0, (isEnabled: boolean) => void 0);
+    chrome.action.isEnabled(undefined, (isEnabled: boolean) => void 0);
 }
 
 // https://developer.chrome.com/docs/extensions/reference/alarms/
@@ -1536,6 +1550,9 @@ function testTabsSendMessage() {
     chrome.tabs.sendMessage(3, "Hello World!", console.log);
     chrome.tabs.sendMessage(4, "Hello World!", {}).then(() => { });
     chrome.tabs.sendMessage(5, "Hello World!", {}, console.log);
+    chrome.tabs.sendMessage(6, "Hello World!", {frameId: 1}, console.log);
+    chrome.tabs.sendMessage(7, "Hello World!", {documentId: 'id'}, console.log);
+    chrome.tabs.sendMessage(8, "Hello World!", {documentId: 'id', frameId: 0}, console.log);
     chrome.tabs.sendMessage<string>(6, "Hello World!", console.log);
     chrome.tabs.sendMessage<string, number>(7, "Hello World!", console.log);
     // @ts-expect-error
